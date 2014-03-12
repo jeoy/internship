@@ -1,20 +1,20 @@
+<?php 
+	include_once './session.php';
+
+	$refresh=new refresh($os);
+
+	if($refresh->islogin and $refresh->isvalid) {
+?>   
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
 </head>
-<body>
-<?php 
-	include_once './session.php';
-	//注释注释1111
-	$refresh=new refresh($os,$path);
-
-	if($refresh->islogin and $refresh->isvalid) {
-?>
+<body>          
 	欢迎你，
 <?php echo $_COOKIE['User_ID']?>！
-	<a href="./logout.php"></a>
+	<a href="./logout.php">退出</a>
 <?php 
 	} else {
 ?>
@@ -26,6 +26,6 @@
 	</form>
 <?php 
 	}
-?>
+?>    
 </body>
 </html>

@@ -10,7 +10,7 @@
 <?php 
 	include_once './session.php';
 
-	$login=new login($os,$path,$_POST['id'],$_POST['passwd']);
+	$login=new login($os,$_POST['id'],$_POST['passwd']);
 	
 	if($login->issucceed) {
 ?>
