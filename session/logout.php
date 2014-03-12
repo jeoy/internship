@@ -10,7 +10,7 @@
 <?php
 	include_once './session.php';
 
-	$logout=new logout($os,$path);
+	$logout=new logout($os);
 ?>
 	页面将在1秒内自动跳转，如果您的浏览器没有响应，请点击此<a href="./page.php">链接</a>
 </body>

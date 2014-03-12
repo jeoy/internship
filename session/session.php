@@ -1,4 +1,6 @@
 <?php
+       
+ 
 class database {
 	var $servername="localhost";
 	var $username="root";
@@ -51,14 +53,20 @@ class database {
 class key extends database {
 	var $key_value;
 	var $key_file_path;
-
-	function key($path) {
-		$this->key_file_path=$path;
+    var   $memcache;
+ 
+	function key() 
+    {
+         $memcache = new Memcache;
+         $memcache->connect('localhost', 11211) or die ("Could not connect");    
+           $date_r= @date("y-m-d", $memcache->get('time'));     
+           $key_r=    $memcache->get('key');   
+		 
 		
 		//read file
-		$fp_r=fopen($this->key_file_path,'r');//$fp_r=fopen("./gloable_variable.txt",'r');//full path:/Applications/XAMPP/xamppfiles/htdocs/session
-		$date_r=@date("y-m-d",fgets($fp_r));
-		$key_r=fgets($fp_r);
+		//$fp_r=fopen($this->key_file_path,'r');//$fp_r=fopen("./gloable_variable.txt",'r');//full path:/Applications/XAMPP/xamppfiles/htdocs/session
+		//$date_r=@date("y-m-d",fgets($fp_r));
+		//$key_r=fgets($fp_r);
 		
 		//get time
 		$time=time();
@@ -82,9 +90,14 @@ class key extends database {
 			  $row=mysql_fetch_array($result);
 			  $this->key_value=$row['value'];
 			 */
-			$fp_w=fopen($this->key_file_path,'w+');
-			fwrite($fp_w, $time."\n");
-			fwrite($fp_w, $this->key_value);
+	 $memcache = new Memcache;
+     $memcache->connect('localhost', 11211) or die ("Could not connect");	        
+    $memcache->set('key', $this->key_value, false,0) or die ("Failed to save data at the server"); 
+    $memcache->set('time', $time, false,0) or die ("Failed to save data at the server"); 
+                    
+            //$fp_w=fopen($this->key_file_path,'w+');
+			//fwrite($fp_w, $time."\n");
+			//fwrite($fp_w, $this->key_value);
 		}
 	}
 }
@@ -107,9 +120,9 @@ class session extends database {
 	
 	var $userpasswd;
 
-	function session($os,$path,$control,$userid,$userpasswd) {
+	function session($os,$control,$userid,$userpasswd) {
 		$this->database();
-		$key=new key($path);
+		$key=new key();
 		$this->key_value=$key->key_value;
 		
 		$this->os=$os;
@@ -181,9 +194,14 @@ class session extends database {
 				//Token_ID and Session_ID
 				$this->userpasswd=$userpasswd;
 				$this->isvalid=$this->compare(); //count md5 to compare, if notvalid, should calculate Session_ID again, no matter valid, calculate Token_ID
-				if(!$this->isvalid) $this->cookie['Session_ID']=$this->cal_session_id();
-				else $this->cookie['Session_ID']=$_COOKIE['Session_ID'];
-				$this->cookie['Token_ID']=$this->count_md5(); //count md5 to set Token_ID
+				if(!$this->isvalid){
+                 $this->cookie['Session_ID']=$this->cal_session_id();
+                                    }
+                else
+                { 
+                    $this->cookie['Session_ID']=$_COOKIE['Session_ID'];
+                 }
+                $this->cookie['Token_ID']=$this->count_md5(); //count md5 to set Token_ID
 				//
 				$this->isset=1;
 				$this->islogin=1;
@@ -291,15 +309,15 @@ class session extends database {
 		$this->expire=time()-60;
 		$this->set_cookie_immediate("",$this->cookie,$this->expire);
 	}
-	function set_cookie_immediate($var, $value, $time=0, $path='', $domain='', $s='') {
+	function set_cookie_immediate($var, $value, $time=0, $domain='', $s='') {
 		$_COOKIE[$var] = $value;
 		if(is_array($value)){
 			foreach($value as $k=>$v){
-				//setcookie($var.'['.$k.']', $v, $time, $path, $domain, $s);
-				setcookie($k, $v, $time, $path, $domain, $s);
+				//setcookie($var.'['.$k.']', $v, $time, $domain, $s);
+				setcookie($k, $v, $time, $domain, $s);
 			}
 		}else{
-			setcookie($var, $value, $time, $path, $domain, $s);
+			setcookie($var, $value, $time,$domain, $s);
 		}
 	}
 	function output() {
@@ -308,16 +326,16 @@ class session extends database {
 }
 
 class refresh extends session {
-	function refresh($os,$path) {
+	function refresh($os) {
 		$control=0;
-		$this->session($os,$path,$control,"","");
+		$this->session($os,$control,"","");
 	}
 }
 
 class login extends session {
 	var $issecure;
 	var $issucceed;
-	function login($os,$path,$userid,$userpasswd) {
+	function login($os,$userid,$userpasswd) {
 		$this->check_secure($userid, $userpasswd);
 		if(!$this->issecure) return;
 		$control=1;
@@ -325,9 +343,9 @@ class login extends session {
 		$passwd=$this->make_single_request("user", "id", $userid, "passwd");
 		$this->issucceed=($passwd==$userpasswd);
 		if($this->issucceed) {
-			$this->session($os,$path,$control,$userid,$userpasswd);
+			$this->session($os,$control,$userid,$userpasswd);
 		} else {
-			$this->session($os,$path,$control,"","");
+			$this->session($os,$control,"","");
 		}
 	}
 	function check_secure($userid,$userpasswd) {
@@ -337,9 +355,9 @@ class login extends session {
 }
 
 class logout extends session {
-	function logout($os,$path) {
+	function logout($os) {
 		$control=-1;
-		$this->session($os,$path,$control,"","");
+		$this->session($os,$control,"","");
 	}
 }
 
@@ -394,10 +412,6 @@ class GetMacAddr {
 }
 
 $os="linux";
-$path="./gloable_variable.txt";
-//$key=new key($path);
-//$session=new session($os,$path);
-//$login=new login($os,$path,"user1","user1passwd");
-//$logout=new logout($path);
-//$refresh=new refresh($os,$path);
+ 
+ 
 ?>
