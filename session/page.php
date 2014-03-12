@@ -1,28 +1,28 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN">
 <html>
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Insert title here</title>
 </head>
 <body>
-<?php
+<?php 
 	include_once './session.php';
-	
+
 	$refresh=new refresh($os,$path);
 
 	if($refresh->islogin and $refresh->isvalid) {
 ?>
-	»¶Ó­Äã£¬<?php echo $_COOKIE['User_ID']?>£¡
-	<a href="./logout.php">ÍË³öµÇÂ¼</a>
-<?php
-	}
-	else {
+	欢迎你，
+<?php echo $_COOKIE['User_ID']?>！
+	<a href="./logout.php"></a>
+<?php 
+	} else {
 ?>
 	<form action="./login.php" method="post">
-		ÇëµÇÂ¼
+		请登录
 		<input type="text" name="id"/>
 		<input type="password" name="passwd"/>
-		<input type="submit" value="µÇÂ½">
+		<input type="submit" value="登陆/">
 	</form>
 <?php 
 	}
