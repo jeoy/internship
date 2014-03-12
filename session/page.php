@@ -7,7 +7,7 @@
 <body>
 <?php 
 	include_once './session.php';
-
+	//注释注释1111
 	$refresh=new refresh($os,$path);
 
 	if($refresh->islogin and $refresh->isvalid) {
