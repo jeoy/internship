@@ -195,8 +195,9 @@ class session extends database {
 		
 		//print_r($this->cookie);
 		
-		//set cookie
-		$this->set_cookie_immediate("",$this->cookie);
+		//output
+		//set cookie //$this->set_cookie_immediate("",$this->cookie);
+		$this->output();
 		
 		/*
 		  setcookie("Session_ID",$this->cookie['Session_ID'],$this->expire);
@@ -300,6 +301,9 @@ class session extends database {
 		}else{
 			setcookie($var, $value, $time, $path, $domain, $s);
 		}
+	}
+	function output() {
+		$this->set_cookie_immediate("",$this->cookie);
 	}
 }
 
