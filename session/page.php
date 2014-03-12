@@ -1,7 +1,7 @@
 <?php 
 	include_once './session.php';
 
-	$refresh=new refresh($os);
+	$refresh=new refresh($os);//zyssb
 
 	if($refresh->islogin and $refresh->isvalid) {
 ?>   
