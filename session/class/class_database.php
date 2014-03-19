@@ -1,6 +1,6 @@
 <?php
 
-include_once '../gloable_variable/gloable_variable.php';
+include_once '../global_variable/global_variable.php';
 
 class database {
 	var $servername="localhost";

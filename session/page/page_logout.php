@@ -9,7 +9,7 @@ include_once '../class/class_logout.php';
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <!-- <meta http-equiv="refresh" content="1;./page.php"> -->
-<meta http-equiv="refresh" content="1;./page.php">
+<meta http-equiv="refresh" content="1;./page_main.html">
 <title>Insert title here</title>
 </head>
 <body>
