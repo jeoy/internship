@@ -11,6 +11,7 @@
 			if($this->err_no==104) {
 				//cannot get cps_id
 				//not working, dont know why
+				$this->cps_id="";
 			} else {
 				$this->cps_number++;
 				$this->make_query("update cps set cps_number = "."'$this->cps_number'"." where cps_id = "."'$this->cps_id'");

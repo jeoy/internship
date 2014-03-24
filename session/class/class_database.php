@@ -52,13 +52,13 @@ class database {
 		$query="select * from ".$table." where ".$key_column." = "."'$key_name'";
 		//echo $query; //select * from user where id = 'user1'
 		$result=mysql_query($query);
-		if (!$result) {
+		$row=mysql_fetch_array($result);
+		if (!$row) {
 			$this->err=mysql_error();
 			$this->err_no=104;
-			die('Could not query: ' . mysql_error());
+			//die('Could not query: ' . mysql_error());
 			return "";
 		} else {
-			$row=mysql_fetch_array($result);
 			//echo $row[$target_column];
 			//return $row;
 			return $row[$target_column];

@@ -9,7 +9,8 @@ class session {
 	var $os;
 	var $cookie;
 	var $expire;
-
+	var $json_cookie; //3.19
+	
 	var $database;
 	var $control;
 	var $microtime;
@@ -30,6 +31,13 @@ class session {
 		$this->os=$os;
 		$this->control=$control;
 		
+		$this->microtime=microtime();
+		$this->date=intval(substr($this->microtime,11,10));//$this->date=substr(date("YmdHis"), 2);//date("y-m-d",time());
+		$this->microsecond=floatval(substr($this->microtime,0,5));
+
+	if($this->control==2) { //generateSessionJSONP //3.19
+		$this->set_cookie($userid, $userpasswd); //3.19
+	} else { //3.19
 		$this->isvalid=(isset($_COOKIE['Session_ID']) and isset($_COOKIE['Token_Date']) and isset($_COOKIE['Token_ID']) );
 		if(!$this->isvalid) {
 			$this->control=0;
@@ -42,10 +50,6 @@ class session {
 			$this->isset=isset($_COOKIE['Session_ID']) or isset($_COOKIE['User_ID']);//$this->islogin or ( (1-isset($_COOKIE['User_ID'])) and isset($_COOKIE['Session']) );
 			//$this->isvalid=isset($_COOKIE['User_ID']) and isset($_COOKIE['Session_ID']); if($this->isvalid) return;
 			
-			$this->microtime=microtime();
-			$this->date=intval(substr($this->microtime,11,10));//$this->date=substr(date("YmdHis"), 2);//date("y-m-d",time());
-			$this->microsecond=floatval(substr($this->microtime,0,5));
-		
 			switch ($this->control) {
 				case 0: //refresh
 					$this->isvalid=$this->compare();
@@ -65,6 +69,7 @@ class session {
 			}
 		}
 	}
+	}
 	function set_cookie($userid,$userpasswd) {
 		$this->cookie=array(
 				'Session_ID'=>"",
@@ -75,7 +80,7 @@ class session {
 		$this->expire=time()+3600;
 
 		//Token_Date
-		$this->cookie['Token_Date']=date("Ymd",$this->date); //"YmdHis"
+		$this->cookie['Token_Date']=date("YmdHis",$this->date); //"YmdHis"
 		
 		//Session_ID and User_ID and Token_ID
 		switch ($this->control) {
@@ -107,6 +112,17 @@ class session {
 				//
 				$this->isset=1;
 				$this->islogin=1;
+				$this->isvalid=1;
+				break;
+			case 2: //generateSessionJSONP, the same with refresh //3.19
+				//Session_ID
+				$this->cookie['Session_ID']=$this->cal_session_id();
+				//User_ID: dont set
+				//Token_ID
+				$this->cookie['Token_ID']=$this->count_md5();
+				//
+				$this->isset=1;
+				$this->islogin=0;
 				$this->isvalid=1;
 				break;
 			default: //logout
@@ -198,6 +214,14 @@ class session {
 				$this->islogin=1;
 				$this->isvalid=1;
 				break;
+			case 2: //generateSessionJSONP, the same with refresh //3.19
+				//without userid and passwd
+				//Token_ID=Session_ID+yyyymmdd+key_today
+				$Token_ID=md5($this->cookie['Session_ID'] . $this->cookie['Token_Date']. $this->key_value);
+				//
+				$this->isset=1;
+				$this->islogin=0;
+				$this->isvalid=1;
 			default: //logout
 				break;
 		}
@@ -225,7 +249,14 @@ class session {
 		}
 	}
 	function output() {
-		$this->set_cookie_immediate("",$this->cookie);
+		switch ($this->control) { //3.19
+			case 2: //jsonp
+				$this->json_cookie=json_encode($this->cookie);
+				break;
+			default: //refresh or login
+				$this->set_cookie_immediate("",$this->cookie);
+				break;
+		}
 	}
 }
 
@@ -278,4 +309,6 @@ class GetMacAddr {
 		return $this->return_array;
 	}
 }
+
+$mark_class_session=1;
 ?>
