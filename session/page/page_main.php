@@ -17,7 +17,7 @@ $refresh=new refresh($os);
 	if($refresh->islogin and $refresh->isvalid) {
 ?>
 	欢迎你，
-<?php echo $_COOKIE['User_ID']?>！
+<?php echo $_COOKIE['User_ID'];?>！
 	<a href="./page_logout.php">退出</a>
 <?php 
 	} else {

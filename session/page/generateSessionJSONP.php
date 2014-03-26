@@ -1,30 +1,20 @@
 <?php 
 
-$cookie=array(
-		'Session_ID'=>"1234",
-		'Token_Date'=>"1234",
-		'User_ID'=>"1234",
-		'Token_ID'=>"1234");
+include_once '../class/class_session.php';
 
-set_cookie_immediate("", $cookie);
-
-//set_cookie_immediate("test", "test_value");
-
-if($_GET['checkCookie']=='Fail') {
-	
-} else {
-	
-}
-
-function set_cookie_immediate($var, $value, $time=0, $domain='', $s='') {
-	$_COOKIE[$var] = $value;
-	if(is_array($value)){
-		foreach($value as $k=>$v){
-			//setcookie($var.'['.$k.']', $v, $time, $domain, $s);
-			setcookie($k, $v, $time, $domain, $s);
-		}
-	}else{
-		setcookie($var, $value, $time,$domain, $s);
+//服务端返回JSON数据
+class generateSessionJSONP extends session {
+	function generateSessionJSONP($os) {
+		$control=2;
+		$this->session($os,$control,"","");
 	}
 }
+$generateSessionJSONP=new generateSessionJSONP($os);
+$result=$generateSessionJSONP->json_cookie;
+
+//动态执行回调函数
+$callback=$_GET['callback'];
+echo $callback."($result)";
+//echo $result;
+exit;
 ?>

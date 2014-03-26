@@ -1,6 +1,6 @@
 <?php
 
-include_once '../gloable_variable/gloable_variable.php';
+include_once '../global_variable/global_variable.php';
 
 class database {
 	var $servername="localhost";
@@ -38,16 +38,31 @@ class database {
 	}
 	function make_query($query) {
 		$result=mysql_query($query);
-		return $result;
+		//return $result;
+		if (!$result) {
+			$this->err=mysql_error();
+			$this->err_no=103;
+			die('Could not query: ' . mysql_error());
+			return "";
+		} else {
+			return $result;
+		}
 	}
 	function make_single_request($table,$key_column,$key_name,$target_column) {
 		$query="select * from ".$table." where ".$key_column." = "."'$key_name'";
 		//echo $query; //select * from user where id = 'user1'
 		$result=mysql_query($query);
 		$row=mysql_fetch_array($result);
-		//echo $row[$target_column];
-		//return $row;
-		return $row[$target_column];
+		if (!$row) {
+			$this->err=mysql_error();
+			$this->err_no=104;
+			//die('Could not query: ' . mysql_error());
+			return "";
+		} else {
+			//echo $row[$target_column];
+			//return $row;
+			return $row[$target_column];
+		}
 	}
 }
 ?>
